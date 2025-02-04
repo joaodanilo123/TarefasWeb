@@ -54,6 +54,7 @@ namespace TarefasWeb.Server
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
