@@ -9,9 +9,11 @@ namespace TarefasWeb.Configurations
         public required string Issuer { get; init; }
         public required string Audience { get; init; }
 
-        public static JwtSettings MountJwtSettings(WebApplicationBuilder builder)
+        public required string ExpiresInMinutes { get; init; }
+
+        public static JwtSettings MountJwtSettings(IConfiguration config)
         {
-            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+            var jwtSettings = config.GetSection("JwtSettings");
 
             if (jwtSettings == null)
             {
@@ -21,6 +23,7 @@ namespace TarefasWeb.Configurations
             var key = jwtSettings["Key"];
             var issuer = jwtSettings["Issuer"];
             var audience = jwtSettings["Audience"];
+            var expiresInMinutes = jwtSettings["ExpiresInMinutes"];
 
             if (key == null)
             {
@@ -34,6 +37,10 @@ namespace TarefasWeb.Configurations
             {
                 throw new Exception("JWT Setting \"Audience\" not found!");
             }
+            if (expiresInMinutes == null)
+            {
+                throw new Exception("JWT Setting \"ExpiresInMinutes\" not found!");
+            }
 
             var secureKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!));
 
@@ -42,6 +49,7 @@ namespace TarefasWeb.Configurations
                 Audience = audience,
                 Issuer = issuer,
                 Key = secureKey,
+                ExpiresInMinutes = expiresInMinutes,
             };
         }
 

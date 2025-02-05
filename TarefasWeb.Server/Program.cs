@@ -1,7 +1,10 @@
 
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using TarefasWeb.Configurations;
+using Microsoft.OpenApi.Models;
+using TarefasWeb.Data;
 
 namespace TarefasWeb.Server
 {
@@ -13,7 +16,7 @@ namespace TarefasWeb.Server
 
 
             //Configuração JWT
-            var jwtSettings = JwtSettings.MountJwtSettings(builder);
+            var jwtSettings = JwtSettings.MountJwtSettings(builder.Configuration);
 
             builder.Services.AddAuthentication(options =>
             {
@@ -35,10 +38,40 @@ namespace TarefasWeb.Server
             });
             //Fim serialização enums
 
+            //Adiciona context do SQLite
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+            );
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options => 
+            {
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Envie o token de autorização",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "bearer",
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[]{}
+                    }
+                });
+            
+            });
            
             var app = builder.Build();
 
