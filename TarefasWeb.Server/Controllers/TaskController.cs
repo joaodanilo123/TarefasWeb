@@ -69,7 +69,7 @@ namespace TarefasWeb.Controllers
             return Ok("Tarefa cadastrada com sucesso");
         }
 
-        [HttpPost("{id}/concluir")]
+        [HttpPut("{id}/status")]
         [Authorize]
         public async Task<IActionResult> UpdateStatus(int id, [FromQuery] Models.TaskStatus status)
         {
@@ -92,7 +92,7 @@ namespace TarefasWeb.Controllers
             return Ok("Tarefa marcada como concluída");
         }
 
-        [HttpPost("{id}/excluir")]
+        [HttpDelete("{id}/excluir")]
         [Authorize]
         public async Task<IActionResult> ExcluirTarefa(int id)
         {
