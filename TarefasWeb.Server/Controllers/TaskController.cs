@@ -81,7 +81,10 @@ namespace TarefasWeb.Controllers
                 return NotFound();
             }
 
-            task.CompletedAt = DateTime.Now;
+            if (status == Models.TaskStatus.COMPLETED) {
+                task.CompletedAt = DateTime.Now;
+            }
+
             task.Status = status;
 
             await _context.SaveChangesAsync();
